@@ -88,7 +88,15 @@ document.addEventListener("DOMContentLoaded", () => {
         canvas.style.display = "none";
         fileInput.value = "";
 
-        navigator.mediaDevices.getUserMedia({ video: true })
+        const currentFacingMode = "environment";
+
+        const constraints = {
+            video: {
+                facingMode: currentFacingMode
+            }
+        };
+
+        navigator.mediaDevices.getUserMedia(constraints)
             .then(s => {
                 stream = s;
                 video.srcObject = stream;
