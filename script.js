@@ -140,19 +140,44 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
-
+    
         stopCameraStream();
         video.style.display = "none";
         captureBtn.style.display = "none";
         newPicBtn.style.display = "inline";
-
+    
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
+                // Set maximum dimensions (adjust as needed)
+                const MAX_WIDTH = 1920;
+                const MAX_HEIGHT = 1080;
+                let width = img.width;
+                let height = img.height;
+    
+                // Only resize if image is larger than our maximum dimensions
+                if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                    const ratio = Math.min(MAX_WIDTH / width, MAX_HEIGHT / height);
+                    width = Math.floor(width * ratio);
+                    height = Math.floor(height * ratio);
+                }
+    
+                // Create canvas for resizing
+                const resizeCanvas = document.createElement('canvas');
+                resizeCanvas.width = width;
+                resizeCanvas.height = height;
+                const resizeCtx = resizeCanvas.getContext('2d');
+                
+                // Draw image with new dimensions
+                resizeCtx.drawImage(img, 0, 0, width, height);
+    
+                // Set main canvas dimensions
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Draw to main canvas
+                ctx.drawImage(resizeCanvas, 0, 0);
                 saveImageState();
                 canvas.style.display = "block";
                 downloadBtn.disabled = false;
